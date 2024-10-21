@@ -41,7 +41,7 @@ static void RedirectSolnOutput(SolnDataT *SolnData)
     if (fptr == -1){
         exit(EXIT_FAILURE);
     }
-    dup2(2,fptr);
+    dup2(1,fptr);
     return;
 
 }
@@ -79,6 +79,14 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData)
      *      + Derive the input file path, NOTE this is created in main via GenerateInputFiles
      *      + Open that file and redirect STDIN to use that file
      */
+     char *input_file_path = SolnData->ExePath;
+     int fptr = open(input_file_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    //Check for error with file
+    if (fptr == -1){
+        exit(EXIT_FAILURE);
+    }
+    dup2(0,fptr);
+
 
     
 

@@ -21,8 +21,8 @@ int GetParamExec(char *argv[])
 
     char *parameter = argv[2];
     //Helper pointer for strtol() 1
-    char *endptr
-    int parameter_integer = strtol(parameter,endptr,10)
+    char *endptr;
+    int parameter_integer = strtol(parameter,&endptr,10);
     return parameter_integer;
 }
 
@@ -46,6 +46,7 @@ int GetParamPipe(char *argv[])
      *      + Read from that pipe... note what you read will depend on what you write
      *        in RunSoln_Pipe
      */
+     
 
     return 0;
 }
