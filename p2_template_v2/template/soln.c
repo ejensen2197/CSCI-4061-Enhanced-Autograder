@@ -20,7 +20,7 @@ int GetParamExec(char *argv[])
      */
 
     char *parameter = argv[2];
-    //Helper pointer for strtol()
+    //Helper pointer for strtol() 1
     char *endptr
     int parameter_integer = strtol(parameter,endptr,10)
     return parameter_integer;
