@@ -11,13 +11,19 @@ int GetParamPipe(char *argv[]);
 
 int GetParamExec(char *argv[])
 {
+    //COMPLETED BY NOAH
     /**
      * TODO => Change B:
      *      + Retrieve the parameter from the input argument
      *      + hint: use index 2
      *      + hint: use strtol not atoi, atoi can be unsafe here
      */
-    return 0;
+
+    char *parameter = argv[2];
+    //Helper pointer for strtol()
+    char *endptr
+    int parameter_integer = strtol(parameter,endptr,10)
+    return parameter_integer;
 }
 
 int GetParamRedirect(char *argv[])
@@ -26,6 +32,8 @@ int GetParamRedirect(char *argv[])
      * TODO => Change B:
      *      + Retrieve the parameter by reading (scanf) from STDIN
      */
+    
+
     return 0;
 }
 

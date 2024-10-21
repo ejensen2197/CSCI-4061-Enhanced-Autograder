@@ -36,7 +36,12 @@ static void RedirectSolnOutput(SolnDataT *SolnData)
      *      + Permission Hints: 0644
      *      + Hint: You can use SolnData->OutputFilePath as the file path to open
      */
-
+    int fptr = open(SolnData->OutputFilePath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    //Check for error with file
+    if (fptr == -1){
+        exit(EXIT_FAILURE);
+    }
+    dup2(2,fptr);
     return;
 
 }
@@ -75,7 +80,7 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData)
      *      + Open that file and redirect STDIN to use that file
      */
 
-
+    
 
 
 
@@ -389,7 +394,7 @@ int main(int argc, char *argv[])
      *      ** CODE PROVIDED FOR YOU ALREADY **
     */
     ArgumentsT args;
-    args = ValidateArguments(argc, argv);
+    args = ValidateArguments(argc, argv); //Completed 
 
     /* (b) Determine the batch size based on the CPU count */
     int batch_size;
