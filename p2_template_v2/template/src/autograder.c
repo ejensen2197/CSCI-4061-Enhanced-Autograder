@@ -79,13 +79,21 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData)
      *      + Derive the input file path, NOTE this is created in main via GenerateInputFiles
      *      + Open that file and redirect STDIN to use that file
      */
-     char *input_file_path = SolnData->ExePath;
-     int fptr = open(input_file_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    //Check for error with file
-    if (fptr == -1){
+    char *input_file_path = SolnData->ExePath;
+    int fptr = open(input_file_path, O_RDONLY);  // O_RDONLY: Open for reading only
+    //printf("Opening input file: %s\n", input_file_path);
+    if (fptr == -1) {
+        perror("ERROR: Failed to open input file");
         exit(EXIT_FAILURE);
     }
-    dup2(0,fptr);
+
+    if (dup2(0,fptr) == -1) { 
+        perror("ERROR: dup2 failed");
+        close(fptr);  // Clean up the file descriptor
+        exit(EXIT_FAILURE);
+    }
+
+    close(fptr);
 
 
     
@@ -112,7 +120,7 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData)
 
 static void NO_RETURN RunSoln_Pipe(SolnDataT *SolnData)
 {
-    int pipefds[2] = {0, 0};
+    int pipefds[2];
 
 
     /**
@@ -120,9 +128,10 @@ static void NO_RETURN RunSoln_Pipe(SolnDataT *SolnData)
      *      + Open a pipe, write the input paramater to the write end of the pipe and close it
      *      + Allow the provided code to pass the file descriptor of the pipe read end to the soln proc
      */
-
-
-
+    char param[128];
+    sprintf(param, "%d", SolnData->InputParam);
+    write(pipefds[1],param,strlen(param));
+    close(pipefds[1]);
 
     
 

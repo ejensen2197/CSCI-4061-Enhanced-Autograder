@@ -32,9 +32,14 @@ int GetParamRedirect(char *argv[])
      * TODO => Change B:
      *      + Retrieve the parameter by reading (scanf) from STDIN
      */
+    int param;
     
-
-    return 0;
+    if(scanf("%d", &param)!= 1) {
+        //fprintf(stderr, "ERROR: Failed to read parameter from stdin\n");
+        return -1;
+    }
+    printf("Parameter: %d\n", param);
+    return param;
 }
 
 int GetParamPipe(char *argv[])
@@ -46,9 +51,16 @@ int GetParamPipe(char *argv[])
      *      + Read from that pipe... note what you read will depend on what you write
      *        in RunSoln_Pipe
      */
-     
+    char *endptr;
+    char *parameter = argv[2];
+    int pipe_fd = strtol(parameter,&endptr,10);
 
-    return 0;
+    char buffer[128];
+    read(pipe_fd, buffer, 128);
+
+    int param = strtol(buffer,&endptr,10);
+
+    return param;
 }
 
 // Simple hash function (djb2)
