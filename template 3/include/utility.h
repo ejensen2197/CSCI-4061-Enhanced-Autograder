@@ -15,7 +15,7 @@
 #include <linux/limits.h>
 #include <fcntl.h>
 
-#define TEMPLATE_VERSION (2)
+#define TEMPLATE_VERSION (3)
 
 #define NUM_PARAMS_MIN (1)
 #define NUM_PARAMS_MAX (4)

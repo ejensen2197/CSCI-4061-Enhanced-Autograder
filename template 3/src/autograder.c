@@ -41,7 +41,7 @@ static void RedirectSolnOutput(SolnDataT *SolnData)
     if (fptr == -1){
         exit(EXIT_FAILURE);
     }
-    dup2(1,fptr);
+    dup2(fptr,STDOUT_FILENO);
     return;
 
 }
@@ -56,7 +56,7 @@ static void NO_RETURN RunSoln_Exec(SolnDataT *SolnData)
 
     /* Convert the IPC Type enumeration as a string to pass into the soln executable */
     char ipc_type_param[MAX_PARAM_LEN];
-    IntToParamStr(IPC_TYPE_REDIRECT, ipc_type_param);
+    IntToParamStr(IPC_TYPE_EXEC, ipc_type_param);
 
     /* Convert the input parameter integer as a string to pass into the soln executable */
     char input_param[MAX_PARAM_LEN];
@@ -79,24 +79,20 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData)
      *      + Derive the input file path, NOTE this is created in main via GenerateInputFiles
      *      + Open that file and redirect STDIN to use that file
      */
-    char *input_file_path = SolnData->ExePath;
-    int fptr = open(input_file_path, O_RDONLY);  // O_RDONLY: Open for reading only
-    //printf("Opening input file: %s\n", input_file_path);
-    if (fptr == -1) {
-        perror("ERROR: Failed to open input file");
+
+    char file_path[50];
+    memset(file_path,'\0',sizeof(file_path));
+    sprintf(file_path, "%s/%d.in", INPUT_DIRECTORY_PATH, SolnData->InputParam);
+    int fd;
+    printf("open");
+    if ((fd = open(file_path, O_RDONLY)) == -1){
+        perror("Failed to open file");
         exit(EXIT_FAILURE);
     }
-
-    if (dup2(0,fptr) == -1) { 
-        perror("ERROR: dup2 failed");
-        close(fptr);  // Clean up the file descriptor
+    if (dup2(fd,STDIN_FILENO) == -1){
+        perror("Failed to DUP");
         exit(EXIT_FAILURE);
     }
-
-    close(fptr);
-
-
-    
 
 
 
@@ -120,8 +116,11 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData)
 
 static void NO_RETURN RunSoln_Pipe(SolnDataT *SolnData)
 {
+    //init pipe and then check for failure of creation
     int pipefds[2];
-
+    if (pipe(pipefds) < 0){
+        exit(EXIT_FAILURE);
+    }
 
     /**
      * TODO => Change B:
@@ -130,8 +129,13 @@ static void NO_RETURN RunSoln_Pipe(SolnDataT *SolnData)
      */
     char param[128];
     sprintf(param, "%d", SolnData->InputParam);
+    //write the parameter into the pipe
     write(pipefds[1],param,strlen(param));
+    //close the write end of the pipe
     close(pipefds[1]);
+
+
+
 
     
 
@@ -411,7 +415,7 @@ int main(int argc, char *argv[])
      *      ** CODE PROVIDED FOR YOU ALREADY **
     */
     ArgumentsT args;
-    args = ValidateArguments(argc, argv); //Completed 
+    args = ValidateArguments(argc, argv);
 
     /* (b) Determine the batch size based on the CPU count */
     int batch_size;

@@ -11,14 +11,12 @@ int GetParamPipe(char *argv[]);
 
 int GetParamExec(char *argv[])
 {
-    //COMPLETED BY NOAH
     /**
      * TODO => Change B:
      *      + Retrieve the parameter from the input argument
      *      + hint: use index 2
      *      + hint: use strtol not atoi, atoi can be unsafe here
      */
-
     char *parameter = argv[2];
     //Helper pointer for strtol() 1
     char *endptr;
@@ -33,18 +31,16 @@ int GetParamRedirect(char *argv[])
      *      + Retrieve the parameter by reading (scanf) from STDIN
      */
     int param;
-    
     if(scanf("%d", &param)!= 1) {
-        //fprintf(stderr, "ERROR: Failed to read parameter from stdin\n");
+        fprintf(stderr, "ERROR: Failed to read parameter from stdin\n");
         return -1;
     }
-    printf("Parameter: %d\n", param);
     return param;
 }
 
 int GetParamPipe(char *argv[])
 {
-    /**
+   /**
      * TODO => Change B:
      *      + Convert the at index 2 into an integer which represents the FD 
      *        of the read end of the pipe
@@ -53,11 +49,13 @@ int GetParamPipe(char *argv[])
      */
     char *endptr;
     char *parameter = argv[2];
+    //convert the char fd into an int fd to use in read call
     int pipe_fd = strtol(parameter,&endptr,10);
 
     char buffer[128];
+    //read from pipe
     read(pipe_fd, buffer, 128);
-
+    //convert the char that was written to pipe in RunSoln_pipe to int so we can return correct type
     int param = strtol(buffer,&endptr,10);
 
     return param;
@@ -86,7 +84,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    int ipc_type_arg = strtol(argv[1], NULL, MAX_PARAM_LEN);
+    int ipc_type_arg = strtol(argv[1], NULL, 10);
     if(ipc_type_arg < 0 || ipc_type_arg >= IPC_TYPE_MAX_LEN)
     {
         fprintf(stderr, "ERROR: Expected argv[1] to be between 0 and %d, but received [%s]\n", IPC_TYPE_MAX_LEN, argv[1]);
