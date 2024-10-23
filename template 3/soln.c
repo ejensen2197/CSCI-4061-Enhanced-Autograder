@@ -52,11 +52,12 @@ int GetParamPipe(char *argv[])
     //convert the char fd into an int fd to use in read call
     int pipe_fd = strtol(parameter,&endptr,10);
 
-    char buffer[128];
+    int param;
     //read from pipe
-    read(pipe_fd, buffer, 128);
+    read(pipe_fd, &param, sizeof(int));
+    close(pipe_fd);
     //convert the char that was written to pipe in RunSoln_pipe to int so we can return correct type
-    int param = strtol(buffer,&endptr,10);
+    //int param = strtol(buffer,&endptr,10);
 
     return param;
 }

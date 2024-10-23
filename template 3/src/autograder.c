@@ -127,10 +127,10 @@ static void NO_RETURN RunSoln_Pipe(SolnDataT *SolnData)
      *      + Open a pipe, write the input paramater to the write end of the pipe and close it
      *      + Allow the provided code to pass the file descriptor of the pipe read end to the soln proc
      */
-    char param[128];
-    sprintf(param, "%d", SolnData->InputParam);
+    //char param[128];
+    //sprintf(param, "%d", SolnData->InputParam);
     //write the parameter into the pipe
-    write(pipefds[1],param,strlen(param));
+    write(pipefds[1],&SolnData->InputParam,sizeof(int));
     //close the write end of the pipe
     close(pipefds[1]);
 
@@ -198,7 +198,7 @@ static void CancelStuckProcessTimer(void)
      * TODO IMPORTANT =>
      *      + Where should CancelStuckProcessTimer be called???
      */
-
+                       
     return;
 
 }
@@ -206,11 +206,11 @@ static void CancelStuckProcessTimer(void)
 /* ----------------------------- BATCH FUNCTIONS ---------------------------- */
 
 static int GetBatchSize(void)
-{
+{                         
     /* Change A --> Code provided for you */
     int cpu_count;
     FILE* fp;
-    char line[256];
+    char line[256];                                                                                          
 
     /* Open the cpuinfo file */
     if((fp = fopen("/proc/cpuinfo", "r")) == NULL){
