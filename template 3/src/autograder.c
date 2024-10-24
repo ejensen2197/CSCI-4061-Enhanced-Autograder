@@ -171,8 +171,21 @@ static void StuckProcessTimerHandler(int signum)
      *      + Hint for looping the SolnDataArr you can re-use some of the code in WaitBatch. Specifically the for loop.
      */
 
+    for(int i = 0; i < CurrentBatchData.Count; i++){
+        SolnDataT *soln_data = &SolnDataArr.Array[CurrentBatchData.StartIndex + i];
+        if(soln_data->WaitStatus == IN_PROGRESS_WAIT_STATUS){
+            // Kill the process using its PID
+            if (kill(soln_data->pid, SIGKILL) == 0){
+                // Successfully killed the process
+                printf("Killed stuck process with PID: %d\n", soln_data->pid);
+            }
+            else{
+                // If kill fails, print an error message
+                perror("ERROR: Failed to kill stuck process");
+            }
+        }
+        }
     return;
-
 }
 
 static void StartStuckProcessTimer(void)
@@ -185,7 +198,18 @@ static void StartStuckProcessTimer(void)
      * TODO IMPORTANT =>
      *      + Where should StartStuckProcessTimer be called????
      */
+    struct sigaction act;
+    act.sa_handler = StuckProcessTimerHandler;
+    sigfillset (&act.sa_mask);
+    act.sa_flags = 0;
+    sigaction(SIGALRM, &act, NULL);
 
+    struct itimerval timer;
+    timer.it_interval.tv_sec = 0; // (now) time to first int
+    timer.it_interval.tv_usec = 0;
+    timer.it_value.tv_sec = STUCK_PROC_TIMER_VALUE_SEC; // value to reload
+    timer.it_value.tv_usec = STUCK_PROC_TIMER_VALUE_USEC;
+    setitimer (ITIMER_REAL, &timer, NULL);
     return;
 }
 
@@ -198,7 +222,13 @@ static void CancelStuckProcessTimer(void)
      * TODO IMPORTANT =>
      *      + Where should CancelStuckProcessTimer be called???
      */
-                       
+
+    struct itimerval timer;
+    timer.it_interval.tv_sec = 0; // (now) time to first int
+    timer.it_interval.tv_usec = 0;
+    timer.it_value.tv_sec = 0; // value to reload
+    timer.it_value.tv_usec = 0;
+    setitimer (ITIMER_REAL, &timer, NULL);          
     return;
 
 }
